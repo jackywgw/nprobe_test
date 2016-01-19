@@ -891,7 +891,7 @@ AC_SUBST(NOW)
 AC_SUBST(N2DISKMT)
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([utils/Makefile])
+#AC_CONFIG_FILES([utils/Makefile])
 AC_CONFIG_FILES([packages/nprobe.spec])
 AC_CONFIG_FILES([packages/n2disk.spec])
 AC_CONFIG_FILES([packages/n2disknt.spec])

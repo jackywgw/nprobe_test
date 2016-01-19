@@ -220,14 +220,15 @@ void setPayload(FlowHashBucket *bkt,
   if((bkt->core.tuple.flowCounters.pktSent < MAX_PKTS)
      && (bkt->core.tuple.flowCounters.pktRcvd < MAX_PKTS)) {
     u_int16_t ndpi_proto;
-
+    ndpi_protocol wgw;
     if(!bkt->core.l7.proto.ndpi.searched_port_based_protocol) {
-      ndpi_proto = ndpi_find_port_based_protocol(readOnlyGlobals.l7.l7handler,
+      wgw = ndpi_find_port_based_protocol(readOnlyGlobals.l7.l7handler,
 						 bkt->core.tuple.key.k.ipKey.proto,
 						 bkt->core.tuple.key.k.ipKey.src.ipType.ipv4,
 						 bkt->core.tuple.key.k.ipKey.sport,
 						 bkt->core.tuple.key.k.ipKey.dst.ipType.ipv4,
 						 bkt->core.tuple.key.k.ipKey.dport);
+      ndpi_proto = wgw.master_protocol;
       setnDPIProto(bkt, ndpi_proto);
       bkt->core.l7.proto.ndpi.searched_port_based_protocol = 1;
     }
@@ -240,13 +241,13 @@ void setPayload(FlowHashBucket *bkt,
       /* traceEvent(TRACE_NORMAL, "[caplen=%u/len=%u][ip_offset=%u][payloadLen=%u][diff=%d]",
 	 h->caplen, h->len, ip_offset, payloadLen, h->caplen-ip_offset);
       */
-      ndpi_proto = ndpi_detection_process_packet(readOnlyGlobals.l7.l7handler,
+      wgw = ndpi_detection_process_packet(readOnlyGlobals.l7.l7handler,
 						 bkt->core.l7.proto.ndpi.flow,
 						 (u_int8_t *)&p[ip_offset],
 						 h->caplen-ip_offset, when,
 						 bkt->core.l7.proto.ndpi.src,
 						 bkt->core.l7.proto.ndpi.dst);
-
+      ndpi_proto = wgw.master_protocol;
       setnDPIProto(bkt, ndpi_proto);
     }
   } else {
@@ -2790,13 +2791,14 @@ void exportBucket(FlowHashBucket *myBucket, u_char free_memory) {
      // && myBucket->core.l7.proto.ndpi.flow
      ) {
     u_int16_t ndpi_proto;
-
-    ndpi_proto = ndpi_guess_undetected_protocol(readOnlyGlobals.l7.l7handler,
+    ndpi_protocol wgw;
+    wgw = ndpi_guess_undetected_protocol(readOnlyGlobals.l7.l7handler,
 						myBucket->core.tuple.key.k.ipKey.proto,
 						myBucket->core.tuple.key.k.ipKey.src.ipType.ipv4,
 						myBucket->core.tuple.key.k.ipKey.sport,
 						myBucket->core.tuple.key.k.ipKey.dst.ipType.ipv4,
 						myBucket->core.tuple.key.k.ipKey.dport);
+    ndpi_proto = wgw.master_protocol;
     setnDPIProto(myBucket, ndpi_proto);
   }
 
